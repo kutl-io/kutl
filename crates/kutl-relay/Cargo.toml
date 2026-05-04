@@ -1,0 +1,43 @@
+[package]
+name = "kutl-relay"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[package.metadata.dist]
+dist = false
+
+[dependencies]
+anyhow = "1.0.101"
+async-trait = "0.1.89"
+axum = { version = "0.8.8", features = ["ws"] }
+base64 = "0.22.1"
+bs58 = "0.5.1"
+ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
+# default-features off: avoids pulling futures-macro (unpublished =0.3.32 pin).
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+kutl-core = { version = "0.1.0", path = "../kutl-core" }
+kutl-proto = { version = "0.1.0", path = "../kutl-proto" }
+kutl-sync-protocol = { version = "0.1.0", path = "../kutl-sync-protocol" }
+prost = "0.14.3"
+rand = "0.10.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+sha2 = "0.10.9"
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "tls-rustls", "sqlite", "migrate", "uuid"] }
+tempfile = "3.26.0"
+thiserror = "2.0.18"
+tokio = { version = "1.49.0", features = ["full"] }
+tokio-stream = "0.1"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
+uuid = { version = "1", features = ["v4"] }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "rustls"] }
+tempfile = "3.26.0"
+tokio = { version = "1.49.0", features = ["full", "test-util"] }
+tokio-tungstenite = "0.28.0"
