@@ -1,0 +1,44 @@
+[package]
+name = "kutl-daemon"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[package.metadata.dist]
+dist = false
+
+[dependencies]
+anyhow = "1.0.101"
+axum = "0.8.8"
+base64 = "0.22.1"
+dirs = "6.0.0"
+ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+kutl-client = { version = "0.1.0", path = "../kutl-client" }
+kutl-core = { version = "0.1.0", path = "../kutl-core" }
+kutl-proto = { version = "0.1.0", path = "../kutl-proto" }
+metrics = "0.24.5"
+metrics-exporter-prometheus = { version = "0.18.3", default-features = false }
+notify = "8.2.0"
+prost = "0.14.3"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+sha2 = "0.10.9"
+tempfile = "3.25.0"
+thiserror = "2.0.18"
+tokio = { version = "1.49.0", features = ["full"] }
+tokio-tungstenite = "0.28.0"
+tokio-util = { version = "0.7.18", features = ["rt"] }
+tracing = "0.1.44"
+uuid = { version = "1.21.0", features = ["v4"] }
+walkdir = "2.5.0"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+bs58 = "0.5.1"
+kutl-relay = { path = "../kutl-relay" }
+rand = "0.10.0"
+tempfile = "3.25.0"
+tokio-tungstenite = "0.28.0"

@@ -1,0 +1,30 @@
+[package]
+name = "kutl-bench"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[package.metadata.dist]
+dist = false
+
+[dependencies]
+automerge = "0.7.4"
+kutl-core = { version = "0.1.0", path = "../kutl-core" }
+kutl-sim = { version = "0.1.0", path = "../kutl-sim" }
+loro = "1.10.3"
+rand = "0.10.0"
+yrs = "0.25.0"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+criterion = { version = "0.8.2", features = ["html_reports"] }
+
+[[bench]]
+name = "crdt_compare"
+harness = false
+
+[[bench]]
+name = "sync_throughput"
+harness = false

@@ -1,0 +1,52 @@
+name: Path safety
+
+# Defense-in-depth check on the contents of this mirror. See the
+# upstream release runbook for the rationale and the full list of
+# forbidden patterns; this file enumerates only what's strictly
+# necessary to enforce.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  forbidden-paths:
+    name: forbidden paths
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reject forbidden paths
+        run: |
+          set -euo pipefail
+
+          forbidden_dirs=(commercial kutlhub-relay)
+          forbidden_files=(.env .env.local .env.production terraform.tfvars)
+
+          fail=0
+
+          for dir in "${forbidden_dirs[@]}"; do
+            matches="$(find . -path './.git' -prune -o -type d -name "${dir}" -print 2>/dev/null || true)"
+            if [[ -n "${matches}" ]]; then
+              echo "::error::forbidden path '${dir}'"
+              fail=1
+            fi
+          done
+
+          for file in "${forbidden_files[@]}"; do
+            matches="$(find . -path './.git' -prune -o -type f -name "${file}" -print 2>/dev/null || true)"
+            if [[ -n "${matches}" ]]; then
+              echo "::error::forbidden file '${file}'"
+              fail=1
+            fi
+          done
+
+          if [[ $fail -ne 0 ]]; then
+            echo "Tree contains paths that must not appear in this mirror."
+            exit 1
+          fi
+
+          echo "OK"

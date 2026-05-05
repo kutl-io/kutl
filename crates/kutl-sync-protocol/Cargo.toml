@@ -1,0 +1,21 @@
+[package]
+name = "kutl-sync-protocol"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+# Pure-logic crate: no tokio, no reqwest, no filesystem. Safe to build for
+# wasm32 so the classification rules can be shared between the daemon, the
+# relay, and the browser. Kept deliberately dependency-light so WASM binary
+# size stays small.
+
+[dependencies]
+
+[dev-dependencies]
+proptest = "1"
+
+[lints]
+workspace = true
+
+[package.metadata.dist]
+dist = false
