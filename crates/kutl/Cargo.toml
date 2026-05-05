@@ -1,0 +1,45 @@
+[package]
+name = "kutl"
+version = "0.1.4"
+edition = "2024"
+description = "Collaborative text synchronization tool"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/kutl-io/kutl"
+homepage = "https://kutl.io"
+
+[dependencies]
+anyhow = "1.0.101"
+base64 = "0.22.1"
+bs58 = "0.5.1"
+clap = { version = "4.5.59", features = ["derive"] }
+dirs = "6.0.0"
+ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
+futures-util = "0.3.32"
+jiff = "0.2.20"
+kutl-client = { version = "0.1.0", path = "../kutl-client" }
+kutl-core = { version = "0.1.0", path = "../kutl-core" }
+kutl-daemon = { version = "0.1.0", path = "../kutl-daemon" }
+kutl-proto = { version = "0.1.0", path = "../kutl-proto" }
+kutl-relay = { version = "0.1.0", path = "../kutl-relay" }
+libc = "0.2"
+open = "5.3.3"
+rand = "0.10.0"
+rand_core = "0.6"
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "rustls", "stream"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = { version = "0.28.0", features = ["rustls-tls-native-roots"] }
+tokio-util = { version = "0.7.18", features = ["rt"] }
+tracing = "0.1"
+tracing-appender = "0.2.4"
+tracing-subscriber = { version = "0.3.22", features = ["fmt", "env-filter", "json", "registry"] }
+urlencoding = "2.1.3"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+kutl-core = { path = "../kutl-core" }
+serial_test = "3.4.0"
+tempfile = "3.25.0"

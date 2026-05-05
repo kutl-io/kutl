@@ -1,0 +1,38 @@
+[package]
+name = "kutl-client"
+version = "0.1.0"
+edition = "2024"
+
+[package.metadata.dist]
+dist = false
+
+[dependencies]
+anyhow = "1.0.102"
+base64 = "0.22.1"
+bs58 = "0.5.1"
+dirs = "6.0.0"
+ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
+futures-util = { version = "0.3.32", default-features = false, features = ["sink", "std"] }
+jiff = "0.2.23"
+kutl-core = { version = "0.1.0", path = "../kutl-core" }
+kutl-proto = { version = "0.1.0", path = "../kutl-proto" }
+libc = "0.2.183"
+rand = "0.10.0"
+rand_core = "0.6"
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "rustls"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+tokio = { version = "1.49.0", features = ["full"] }
+tokio-tungstenite = "0.28.0"
+toml = "1.1.2"
+tracing = "0.1.44"
+walkdir = "2.5.0"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+axum = { version = "0.8.8", features = ["ws"] }
+kutl-relay = { path = "../kutl-relay" }
+serial_test = "3.4.0"
+tempfile = "3.26.0"
