@@ -1,0 +1,55 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/kutl-core",
+    "crates/kutl-proto",
+    "crates/kutl-relay",
+    "crates/kutl-client",
+    "crates/kutl-daemon",
+    "crates/kutl",
+    "crates/kutl-sim",
+    "crates/kutl-stress",
+    "crates/kutl-bench",
+    "crates/kutl-sync-protocol",
+    "crates/kutl-sync-protocol-wasm",
+]
+# kutl-desktop lives outside the workspace because cargo-dist (release
+# pipeline) builds the entire workspace per target, and Tauri's GTK/
+# webkit deps require platform-specific system libs the release runners
+# don't have. Build standalone:
+#   cargo build --manifest-path crates/kutl-desktop/src-tauri/Cargo.toml
+exclude = ["crates/kutl-desktop"]
+
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+# Config for 'dist'
+[workspace.metadata.dist]
+# The preferred dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.31.0"
+# CI backends to support
+ci = "github"
+# The installers to generate for each app
+installers = ["shell", "homebrew"]
+# Target platforms to build apps for (Rust target-triple syntax)
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+# A GitHub repo to push Homebrew formulas to
+tap = "kutl-io/homebrew-tap"
+# Publish jobs to run in CI
+publish-jobs = ["homebrew"]
+# Publish GitHub Releases to this repo instead
+github-releases-repo = "kutl-io/kutl"
+# Skip checking whether the specified configuration files are up to date
+allow-dirty = ["ci"]
+# Path that installers should place binaries in
+install-path = "CARGO_HOME"
+# Whether to install an updater program
+install-updater = false
+
+[workspace.lints.clippy]
+pedantic = { level = "deny", priority = -1 }
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"

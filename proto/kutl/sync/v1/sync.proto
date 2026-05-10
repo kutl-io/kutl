@@ -1,0 +1,379 @@
+syntax = "proto3";
+
+package kutl.sync.v1;
+
+// --- Top-level envelope ---
+
+message SyncEnvelope {
+  oneof payload {
+    // Connection
+    Handshake      handshake      = 1;
+    HandshakeAck   handshake_ack  = 2;
+    Error          error          = 3;
+
+    // Document sync
+    Subscribe      subscribe      = 4;
+    Unsubscribe    unsubscribe    = 5;
+    SyncOps        sync_ops       = 6;
+    ChangeNotify   change_notify  = 7;
+    PresenceUpdate presence_update = 8;
+    StaleSubscriber stale_subscriber = 9;
+    Signal signal = 10;
+
+    // Document lifecycle (registry)
+    RegisterDocument          register_document           = 11;
+    RenameDocument            rename_document             = 12;
+    UnregisterDocument        unregister_document         = 13;
+    ListSpaceDocuments        list_space_documents        = 14;
+    ListSpaceDocumentsResult  list_space_documents_result = 15;
+
+    // Space ops (kutlhub)
+    JoinSpace          join_space          = 16;
+    JoinSpaceResult    join_space_result   = 17;
+    ResolveSpace       resolve_space       = 18;
+    ResolveSpaceResult resolve_space_result = 19;
+    ListMySpaces       list_my_spaces      = 20;
+    ListMySpacesResult list_my_spaces_result = 21;
+
+    // RFD 0066: read classification for a subscribe. Sent by the relay
+    // immediately after Subscribe is processed; clients gate editor
+    // writability on the LoadStatus. Older clients that don't handle
+    // this variant will silently ignore it (proto unknown-field behavior)
+    // and proceed as before.
+    SubscribeStatus subscribe_status = 22;
+  }
+}
+
+// --- Handshake ---
+
+message Handshake {
+  uint32 protocol_version_major = 1;
+  uint32 protocol_version_minor = 2;
+  string client_name            = 3;
+  repeated string features      = 4;
+  string auth_token             = 5;  // Bearer token from /auth/verify
+  string display_name           = 6;  // Self-declared display name
+}
+
+message HandshakeAck {
+  uint32 protocol_version_major = 1;
+  uint32 protocol_version_minor = 2;
+  uint32 min_supported_major    = 3;
+  string relay_name              = 4;
+  repeated string features      = 5;
+}
+
+// --- Subscriptions ---
+
+message Subscribe {
+  string space_id  = 1;
+  string document_id = 2;
+}
+
+message Unsubscribe {
+  string space_id  = 1;
+  string document_id = 2;
+}
+
+// RFD 0066: the relay's read classification for a subscribe cold-load.
+// Sent once per subscribe, before any SyncOps catch-up (when present).
+//
+// `FOUND` means the backend returned bytes — safe to render normally.
+// `EMPTY` means the document was never persisted (witness == 0) and the
+//   editor may open writable — legitimate first-time document.
+// `INCONSISTENT` means the witness recorded a prior successful flush at
+//   `expected_version` but the backend now returns nothing — content was
+//   lost between flush and this load. The client MUST refuse writes.
+// `UNAVAILABLE` means at least one backend (or the witness) errored.
+//   State is undetermined; client MUST refuse writes and surface a retry.
+message SubscribeStatus {
+  string space_id    = 1;
+  string document_id = 2;
+  LoadStatus load_status = 3;
+  // Non-zero only for INCONSISTENT: the persisted_version the witness
+  // claims is canonical but which the backend can no longer produce.
+  uint64 expected_version = 4;
+  // Non-empty only for UNAVAILABLE: human-readable reason for a banner.
+  string reason = 5;
+}
+
+enum LoadStatus {
+  LOAD_STATUS_UNSPECIFIED  = 0;
+  LOAD_STATUS_FOUND        = 1;
+  LOAD_STATUS_EMPTY        = 2;
+  LOAD_STATUS_INCONSISTENT = 3;
+  LOAD_STATUS_UNAVAILABLE  = 4;
+}
+
+// --- Sync operations ---
+
+message SyncOps {
+  string space_id         = 1;
+  string document_id      = 2;
+  repeated bytes parents  = 3;
+  bytes ops               = 4;
+  repeated ChangeMetadata metadata = 5;
+  uint32 sequence_number  = 6;
+  bool is_last            = 7;
+  ContentMode content_mode = 8;
+  bytes content_hash       = 9;
+  int64 blob_size          = 10;
+  string blob_ref_url      = 11;
+}
+
+message ChangeMetadata {
+  string author_did = 1;
+  string intent     = 2;
+  int64 timestamp   = 3;  // Unix millis
+  bool full_rewrite = 4;  // true when content was fully replaced (bulk path)
+
+  // Client-provided change snippet. When set, the relay passes it through
+  // instead of computing its own. Allows clients to provide richer summaries.
+  string change_snippet = 5;
+
+  // Extended fields for full change model (RFD 0002)
+  string id                = 6;  // UUID as string
+  Boundary boundary        = 7;
+  VersionSpan version_span = 8;
+}
+
+enum Boundary {
+  BOUNDARY_UNSPECIFIED = 0;
+  BOUNDARY_EXPLICIT    = 1;
+  BOUNDARY_AUTO        = 2;
+}
+
+enum ContentMode {
+  CONTENT_MODE_UNSPECIFIED = 0;
+  CONTENT_MODE_TEXT        = 1;
+  CONTENT_MODE_BLOB        = 2;
+  CONTENT_MODE_BLOB_REF    = 3;
+}
+
+message VersionSpan {
+  repeated uint64 start = 1;
+  repeated uint64 end   = 2;
+}
+
+// Wrapper for the sidecar file.
+message ChangeList {
+  repeated ChangeMetadata changes = 1;
+}
+
+// --- Notifications ---
+
+message ChangeNotify {
+  string space_id  = 1;
+  string document_id = 2;
+  string author_did  = 3;
+  string intent      = 4;
+  uint32 op_count    = 5;
+  int64 timestamp    = 6;
+}
+
+// --- Presence ---
+
+message PresenceUpdate {
+  string space_id        = 1;
+  string document_id     = 2;
+  string participant_did = 3;
+  uint32 cursor_pos      = 4;
+  bytes custom_data      = 5;
+}
+
+// --- Errors ---
+
+message Error {
+  ErrorCode code = 1;
+  string message = 2;
+  string details = 3;
+}
+
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED = 0;
+  AUTH_FAILED            = 1;
+  NOT_FOUND              = 2;
+  RATE_LIMITED           = 3;
+  VERSION_MISMATCH       = 4;
+  QUOTA_EXCEEDED         = 5;
+  INVALID_MESSAGE        = 6;
+}
+
+// --- Stale subscriber eviction ---
+
+enum StaleReason {
+  STALE_REASON_UNSPECIFIED = 0;
+  CHANNEL_FULL             = 1;
+  CHANNEL_CLOSED           = 2;
+  CLIENT_TOO_SLOW          = 3;
+}
+
+message StaleSubscriber {
+  string space_id     = 1;
+  string document_id  = 2;
+  StaleReason reason  = 3;
+  uint64 relay_drops  = 4;
+  uint64 relay_ops_count = 5;
+  int64 timestamp_ms  = 6;
+}
+
+// --- Signals (RFD 0062) ---
+
+enum SignalType {
+  SIGNAL_TYPE_UNSPECIFIED = 0;
+  SIGNAL_TYPE_FLAG        = 1;
+  SIGNAL_TYPE_CHAT        = 2;
+  SIGNAL_TYPE_DECISION    = 3;
+  SIGNAL_TYPE_REPLY       = 4;
+}
+
+enum FlagKind {
+  FLAG_KIND_UNSPECIFIED      = 0;
+  FLAG_KIND_INFO             = 1;
+  FLAG_KIND_COMPLETED        = 2;
+  FLAG_KIND_REVIEW_REQUESTED = 3;
+  FLAG_KIND_QUESTION         = 4;
+  FLAG_KIND_BLOCKED          = 5;
+}
+
+enum AudienceType {
+  AUDIENCE_TYPE_UNSPECIFIED    = 0;
+  AUDIENCE_TYPE_PARTICIPANT    = 1;
+  AUDIENCE_TYPE_SPACE          = 2;
+  AUDIENCE_TYPE_HUMAN_OWNERS   = 3;
+  AUDIENCE_TYPE_HUMAN_EDITORS  = 4;
+  AUDIENCE_TYPE_HUMAN_VIEWERS  = 5;
+  AUDIENCE_TYPE_AGENT_OWNERS   = 6;
+  AUDIENCE_TYPE_AGENT_EDITORS  = 7;
+  AUDIENCE_TYPE_AGENT_VIEWERS  = 8;
+}
+
+enum CloseReason {
+  CLOSE_REASON_UNSPECIFIED = 0;
+  CLOSE_REASON_RESOLVED    = 1;
+  CLOSE_REASON_DECLINED    = 2;
+  CLOSE_REASON_WITHDRAWN   = 3;
+}
+
+enum DecisionState {
+  DECISION_STATE_UNSPECIFIED = 0;
+  DECISION_STATE_OPEN        = 1;
+  DECISION_STATE_RESOLVED    = 2;
+}
+
+message Signal {
+  string id                    = 1;
+  string space_id              = 2;
+  optional string document_id  = 3;
+  string author_did            = 4;
+  int64 timestamp              = 5;  // Unix millis
+  oneof payload {
+    FlagPayload flag           = 10;
+    ChatPayload chat           = 11;
+    DecisionPayload decision   = 12;
+    ReplyPayload reply         = 13;
+  }
+}
+
+message FlagPayload {
+  FlagKind kind                = 1;
+  AudienceType audience_type   = 2;
+  optional string target_did   = 3;
+  string message               = 4;
+}
+
+message ChatPayload {
+  optional string topic        = 1;
+  optional string target_did   = 2;
+}
+
+message DecisionPayload {
+  string title_hash            = 1;
+  string title                 = 2;
+  DecisionState state          = 3;
+  int32 depth                  = 4;
+  optional string parent_hash  = 5;
+}
+
+message ReplyPayload {
+  string parent_signal_id          = 1;
+  optional string parent_reply_id  = 2;
+  string body                      = 3;
+}
+
+// --- Document lifecycle ---
+// Relay-maintained registry operations. Processed by the relay, persisted to
+// the document registry, and broadcast to all space subscribers.
+
+message RegisterDocument {
+  string space_id = 1;
+  string document_id = 2;
+  string path = 3;
+  ChangeMetadata metadata = 4;
+}
+
+message RenameDocument {
+  string space_id = 1;
+  string document_id = 2;
+  string old_path = 3;
+  string new_path = 4;
+  ChangeMetadata metadata = 5;
+}
+
+message UnregisterDocument {
+  string space_id = 1;
+  string document_id = 2;
+  ChangeMetadata metadata = 3;
+}
+
+message ListSpaceDocuments {
+  string space_id = 1;
+}
+
+message ListSpaceDocumentsResult {
+  string space_id = 1;
+  repeated DocumentInfo documents = 2;
+}
+
+message DocumentInfo {
+  string document_id = 1;
+  string path = 2;
+}
+
+// --- Space ops (kutlhub) ---
+
+message JoinSpace {
+  string code = 1;
+}
+
+message JoinSpaceResult {
+  string space_id = 1;
+  string space_name = 2;
+  string space_slug = 3;
+  string owner_account_id = 4;
+}
+
+message ResolveSpace {
+  string owner = 1;
+  string slug = 2;
+}
+
+message ResolveSpaceResult {
+  string space_id = 1;
+  string space_name = 2;
+  string relay_url = 3;
+}
+
+message ListMySpaces {}
+
+message ListMySpacesResult {
+  repeated SpaceInfo spaces = 1;
+}
+
+message SpaceInfo {
+  string space_id = 1;
+  string name = 2;
+  string slug = 3;
+  string owner_account_id = 4;
+  string role = 5;
+}
