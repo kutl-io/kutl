@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kutl</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- ── Welcome state ──────────────────────────── -->
+    <div id="state-welcome" class="wizard-state active">
+      <h1 class="wordmark">kutl</h1>
+      <p class="subtitle">Real-time file sync for teams</p>
+
+      <div class="input-group">
+        <input
+          type="url"
+          id="invite-url"
+          placeholder="Paste invite link..."
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button id="btn-join" class="btn btn-primary">Join</button>
+      </div>
+
+      <div id="welcome-error" class="error-message" style="display: none;"></div>
+
+      <div class="divider">or</div>
+
+      <button id="btn-create" class="btn btn-secondary btn-block">
+        Create a new space
+      </button>
+
+      <p class="footer">kutl is running in your menu bar</p>
+    </div>
+
+    <!-- ── Waiting state (for future deep-link flow) ─ -->
+    <div id="state-waiting" class="wizard-state">
+      <h1 class="wordmark">kutl</h1>
+      <div class="spinner"></div>
+      <p class="status-message">Waiting for browser...</p>
+      <p class="footer">Complete sign-in in your browser to continue</p>
+    </div>
+
+    <!-- ── Folder picker state ────────────────────── -->
+    <div id="state-folder" class="wizard-state">
+      <h1 class="wordmark">kutl</h1>
+
+      <div class="space-info">
+        <div class="space-info-label">Space</div>
+        <div id="folder-space-name" class="space-info-value"></div>
+        <div class="space-info-label">Relay</div>
+        <div id="folder-relay-host" class="space-info-value"></div>
+      </div>
+
+      <div class="space-info-label" style="text-align: left; margin-bottom: 0.375rem;">
+        Sync folder
+      </div>
+      <div class="folder-row">
+        <div id="folder-path-display" class="folder-path"></div>
+        <button id="btn-browse" class="btn btn-secondary">Browse...</button>
+      </div>
+
+      <div id="folder-error" class="error-message" style="display: none;"></div>
+
+      <button id="btn-start-syncing" class="btn btn-primary btn-block">
+        Start syncing
+      </button>
+
+      <button id="btn-back-to-welcome" class="btn btn-secondary btn-block" style="margin-top: 0.5rem;">
+        Back
+      </button>
+    </div>
+
+    <!-- ── Done state ─────────────────────────────── -->
+    <div id="state-done" class="wizard-state">
+      <div class="success-icon">&#10003;</div>
+      <h1 class="wordmark">kutl</h1>
+      <p class="status-message">
+        <strong id="done-space-name"></strong> is syncing to<br>
+        <code id="done-folder" style="font-size: 0.85rem; color: var(--text-secondary);"></code>
+      </p>
+
+      <div class="button-group">
+        <button id="btn-open-folder" class="btn btn-primary">Open folder</button>
+        <button id="btn-close" class="btn btn-secondary">Done</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
