@@ -1,0 +1,9 @@
+target/
+**/target/
+.git/
+.gitignore
+.gitattributes
+.github/
+test-vectors/
+*.md
+.DS_Store
