@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kutl Preferences</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Preferences layout overrides ─────────────────── */
+
+    body {
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 0;
+    }
+
+    .prefs-root {
+      width: 100%;
+      padding: 1.5rem 1.75rem;
+    }
+
+    /* ── Section headers ───────────────────────────────── */
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.625rem;
+      padding-bottom: 0.375rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Toggle row ────────────────────────────────────── */
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .toggle-label {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    /* Toggle switch */
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--accent);
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle-switch input:checked + .toggle-track::after {
+      transform: translateX(18px);
+    }
+
+    /* ── Space list ────────────────────────────────────── */
+
+    .space-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .space-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .space-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .space-status-dot.synced   { background: var(--success); }
+    .space-status-dot.connecting { background: var(--text-muted); }
+    .space-status-dot.error    { background: var(--error); }
+
+    .space-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .space-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .space-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.1rem;
+    }
+
+    .space-meta span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+    }
+
+    .space-actions {
+      display: flex;
+      gap: 0.375rem;
+      flex-shrink: 0;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-icon:hover {
+      background: var(--accent-secondary-hover);
+      color: var(--text-primary);
+    }
+
+    .btn-stop {
+      color: var(--error);
+      border-color: var(--error);
+    }
+
+    .btn-stop:hover {
+      background: color-mix(in oklch, var(--error) 15%, transparent);
+    }
+
+    .space-empty {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      padding: 0.5rem 0;
+    }
+
+    /* ── About section ─────────────────────────────────── */
+
+    .about-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .about-label {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .about-value {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .about-link {
+      font-size: 0.875rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .about-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Loading state ─────────────────────────────────── */
+
+    .loading-placeholder {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      padding: 0.25rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="prefs-root">
+
+    <!-- ── Launch at Login ──────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">General</div>
+      <div class="toggle-row">
+        <span class="toggle-label">Launch at login</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggle-launch-at-login">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ── Spaces ───────────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">Spaces</div>
+      <div id="space-list" class="space-list">
+        <div class="loading-placeholder">Loading...</div>
+      </div>
+    </div>
+
+    <!-- ── About ────────────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">About</div>
+      <div class="about-row" style="margin-bottom: 0.5rem;">
+        <span class="about-label">Version</span>
+        <span id="about-version" class="about-value">0.1.0</span>
+      </div>
+      <div class="about-row">
+        <span class="about-label">Website</span>
+        <a id="about-link" href="#" class="about-link" target="_blank">kutl.io</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    'use strict';
+
+    const { invoke } = window.__TAURI__.core;
+
+    // ── Status helpers ─────────────────────────────────────────────
+
+    /** Map sync state string to CSS class and display symbol. */
+    function stateInfo(state) {
+      switch (state) {
+        case 'synced':      return { cls: 'synced',      symbol: '✓' };
+        case 'connecting':  return { cls: 'connecting',  symbol: '⟳' };
+        case 'error':       return { cls: 'error',       symbol: '✗' };
+        default:            return { cls: 'connecting',  symbol: '⟳' };
+      }
+    }
+
+    /** Extract the hostname from a WebSocket or HTTP URL for display. */
+    function relayHost(url) {
+      try {
+        // normalize ws:// → http:// so URL() can parse it
+        const normalized = url.replace(/^wss?:\/\//, 'http://');
+        return new URL(normalized).host;
+      } catch (_e) {
+        return url;
+      }
+    }
+
+    // ── Render spaces ─────────────────────────────────────────────
+
+    function renderSpaces(spaces) {
+      const list = document.getElementById('space-list');
+      list.innerHTML = '';
+
+      if (spaces.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'space-empty';
+        empty.textContent = 'No spaces synced yet.';
+        list.appendChild(empty);
+        return;
+      }
+
+      for (const space of spaces) {
+        const { cls, symbol } = stateInfo(space.state);
+
+        const card = document.createElement('div');
+        card.className = 'space-card';
+
+        const dot = document.createElement('div');
+        dot.className = `space-status-dot ${cls}`;
+        dot.title = `${symbol} ${space.state}`;
+
+        const details = document.createElement('div');
+        details.className = 'space-details';
+
+        const name = document.createElement('div');
+        name.className = 'space-name';
+        name.textContent = space.space_name;
+
+        const meta = document.createElement('div');
+        meta.className = 'space-meta';
+
+        const folderSpan = document.createElement('span');
+        folderSpan.textContent = space.folder;
+        folderSpan.title = space.folder;
+
+        const relaySpan = document.createElement('span');
+        relaySpan.textContent = relayHost(space.relay_url);
+        relaySpan.title = space.relay_url;
+
+        meta.appendChild(folderSpan);
+        meta.appendChild(document.createTextNode(' · '));
+        meta.appendChild(relaySpan);
+
+        details.appendChild(name);
+        details.appendChild(meta);
+
+        const actions = document.createElement('div');
+        actions.className = 'space-actions';
+
+        const openBtn = document.createElement('button');
+        openBtn.className = 'btn-icon';
+        openBtn.title = 'Open folder';
+        openBtn.textContent = '⤴';
+        openBtn.addEventListener('click', () => {
+          invoke('open_folder', { path: space.folder }).catch(() => {});
+        });
+
+        const stopBtn = document.createElement('button');
+        stopBtn.className = 'btn-icon btn-stop';
+        stopBtn.title = 'Stop syncing';
+        stopBtn.textContent = 'Stop';
+        stopBtn.addEventListener('click', async () => {
+          stopBtn.disabled = true;
+          try {
+            await invoke('stop_space', { spaceId: space.space_id });
+            await loadSpaces();
+          } catch (err) {
+            stopBtn.disabled = false;
+            console.error('stop_space failed:', err);
+          }
+        });
+
+        actions.appendChild(openBtn);
+        actions.appendChild(stopBtn);
+
+        card.appendChild(dot);
+        card.appendChild(details);
+        card.appendChild(actions);
+
+        list.appendChild(card);
+      }
+    }
+
+    // ── Data loading ──────────────────────────────────────────────
+
+    async function loadSpaces() {
+      try {
+        const spaces = await invoke('list_spaces');
+        renderSpaces(spaces);
+      } catch (err) {
+        const list = document.getElementById('space-list');
+        list.innerHTML = `<div class="space-empty">Failed to load spaces: ${err}</div>`;
+      }
+    }
+
+    async function loadLaunchAtLogin() {
+      try {
+        const enabled = await invoke('get_launch_at_login');
+        document.getElementById('toggle-launch-at-login').checked = enabled;
+      } catch (_err) {
+        // Non-fatal — leave toggle in default state.
+      }
+    }
+
+    async function loadAbout() {
+      try {
+        const url = await invoke('about_url');
+        const link = document.getElementById('about-link');
+        link.href = url;
+        link.textContent = url.replace('https://', '');
+      } catch (_err) {
+        // Non-fatal — leave defaults.
+      }
+    }
+
+    // ── Event wiring ──────────────────────────────────────────────
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Load all data in parallel.
+      await Promise.all([loadSpaces(), loadLaunchAtLogin(), loadAbout()]);
+
+      // Wire launch-at-login toggle.
+      const toggle = document.getElementById('toggle-launch-at-login');
+      toggle.addEventListener('change', async () => {
+        const enabled = toggle.checked;
+        try {
+          await invoke('set_launch_at_login', { enabled });
+        } catch (err) {
+          // Revert on failure.
+          toggle.checked = !enabled;
+          console.error('set_launch_at_login failed:', err);
+        }
+      });
+
+      // About link opens in default browser.
+      document.getElementById('about-link').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const href = e.currentTarget.href;
+        try {
+          await window.__TAURI__.shell.open(href);
+        } catch (_err) {
+          // Fallback — try opening directly (won't work in sandboxed webview).
+        }
+      });
+    });
+  </script>
+</body>
+</html>
