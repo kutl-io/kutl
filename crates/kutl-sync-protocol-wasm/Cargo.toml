@@ -1,0 +1,23 @@
+[package]
+name = "kutl-sync-protocol-wasm"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+# wasm-bindgen wrapper that re-exports `kutl-sync-protocol`'s pure
+# classification rules to the browser. Consumers (currently the UX
+# client) import the generated JS shim + .wasm artifact produced by
+# `wasm-pack build --target web`.
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+kutl-sync-protocol = { version = "0.1.0", path = "../kutl-sync-protocol" }
+wasm-bindgen = "0.2"
+
+[lints]
+workspace = true
+
+[package.metadata.dist]
+dist = false
