@@ -1,0 +1,9 @@
+{
+  "_comment": "Cross-language wire-contract constants. This file is the rendezvous between the Rust crates and @kutl/proto: TypeScript exports and Rust constants are each pinned to it by their own test gates, so either side drifting breaks its own build. Admission is narrow — a value belongs here only when drift between the stacks is an outage or a stranded client.",
+  "protocol_version_major": 1,
+  "protocol_version_minor": 0,
+  "min_supported_protocol_major": 1,
+  "absolute_blob_max": 26214400,
+  "capability_signal_records": "signal-records",
+  "capability_signal_reseed": "signal-reseed"
+}

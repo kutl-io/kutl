@@ -1,0 +1,16 @@
+{
+  "name": "kutl-sync-protocol-wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "MIT OR Apache-2.0",
+  "files": [
+    "kutl_sync_protocol_bg.wasm",
+    "kutl_sync_protocol.js",
+    "kutl_sync_protocol.d.ts"
+  ],
+  "main": "kutl_sync_protocol.js",
+  "types": "kutl_sync_protocol.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

@@ -1,0 +1,19 @@
+kutl-relay NOTICE
+
+This crate's source code is licensed under AGPL-3.0-only (see ../../LICENSE-AGPL).
+The following embedded assets are NOT covered by that license:
+
+1. kutl cuttlefish logo
+   Files: src/assets/kutl-logo.svg, src/assets/favicon.svg
+   The cuttlefish mark and the "kutl" wordmark are trademarks of kutl. They are
+   included only to identify the official kutl relay. Redistribution of modified
+   versions of this software must not use these marks in a way that suggests
+   endorsement by or affiliation with kutl. The AGPL grant for the source code
+   does not grant any trademark rights.
+
+2. Rajdhani (SemiBold, Latin subset)
+   File: src/assets/rajdhani-latin-600-normal.woff2
+   Licensed under the SIL Open Font License, Version 1.1.
+   Copyright (c) 2014 Indian Type Foundry (info@indiantypefoundry.com)
+   Distributed via @fontsource/rajdhani 5.2.7. Full license text:
+   https://openfontlicense.org
