@@ -1,0 +1,211 @@
+/* kutl relay — admin & invite-landing styles.
+ *
+ * Colors are the kutl.io OKLCH design tokens, light + dark selected via
+ * prefers-color-scheme. OKLCH is used directly (no hex fallback) to match the
+ * site exactly; it is supported by all current browsers.
+ */
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  /* Route /assets/rajdhani.woff2 is served by handle_font_rajdhani in web.rs;
+     keep this URL in sync with that route. */
+  src: url('/assets/rajdhani.woff2') format('woff2');
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0.015 225);
+  --card: oklch(1 0 0);
+  --primary: oklch(0.5 0.19 225);
+  --primary-foreground: oklch(0.985 0 0);
+  --primary-hover: oklch(0.44 0.19 225);
+  --secondary: oklch(0.965 0.005 225);
+  --muted-foreground: oklch(0.55 0.02 225);
+  --border: oklch(0.925 0.007 225);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-hover: oklch(0.52 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --ok-bg: oklch(0.95 0.04 165);
+  --ok-fg: oklch(0.45 0.13 165);
+  --exp-bg: oklch(0.95 0.04 27);
+  --exp-fg: oklch(0.5 0.2 27);
+  --error-fg: oklch(0.5 0.2 27);
+  --radius: 0.5rem;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+  --font-logo: 'Rajdhani', system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.155 0.015 225);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.2 0.015 225);
+    --primary: oklch(0.7 0.145 225);
+    --primary-foreground: oklch(0.155 0 0);
+    --primary-hover: oklch(0.78 0.145 225);
+    --secondary: oklch(0.25 0.015 225);
+    --muted-foreground: oklch(0.65 0.02 225);
+    --border: oklch(0.27 0.015 225);
+    --ok-bg: oklch(0.3 0.06 165);
+    --ok-fg: oklch(0.82 0.13 165);
+    --exp-bg: oklch(0.32 0.08 27);
+    --exp-fg: oklch(0.82 0.12 27);
+    --error-fg: oklch(0.82 0.12 27);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 2rem;
+}
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.brand-header a { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+.brand-header a:hover { text-decoration: none; }
+.brand-logo { color: var(--primary); display: inline-flex; }
+.brand-logo svg { height: 1.75rem; width: auto; display: block; }
+.brand-name {
+  font-family: var(--font-logo);
+  font-weight: 600;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--foreground); }
+h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--foreground); }
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+.card-row { display: flex; align-items: center; gap: 1rem; }
+.card-name { flex: 1; font-weight: 500; }
+.card-meta { font-size: 0.8rem; color: var(--muted-foreground); font-family: var(--font-mono); }
+
+.btn {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: calc(var(--radius) - 2px);
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.btn:hover { background: var(--primary-hover); text-decoration: none; }
+.btn-danger { background: var(--destructive); color: var(--destructive-foreground); }
+.btn-danger:hover { background: var(--destructive-hover); }
+
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: calc(var(--radius) - 4px);
+  font-weight: 500;
+}
+.badge-ok { background: var(--ok-bg); color: var(--ok-fg); }
+.badge-exp { background: var(--exp-bg); color: var(--exp-fg); }
+
+.back { margin-bottom: 1.25rem; font-size: 0.9rem; }
+.empty { color: var(--muted-foreground); font-style: italic; margin-top: 0.5rem; }
+.monospace { font-family: var(--font-mono); font-size: 0.85rem; }
+.error { color: var(--error-fg); }
+
+.cmd-block {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--foreground);
+  margin-top: 0.5rem;
+  word-break: break-all;
+}
+
+.join-box { max-width: 480px; margin: 0 auto; text-align: center; }
+.join-box .card { text-align: left; margin-top: 1.5rem; }
+.join-title { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.join-sub { color: var(--muted-foreground); margin-bottom: 2rem; }
+.open-btn {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 1rem;
+}
+.open-btn:hover { background: var(--primary-hover); text-decoration: none; }
+
+.create-space {
+  margin-bottom: 1.5rem;
+}
+.create-space > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  padding: 0.4rem 0.85rem;
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.create-space > summary::-webkit-details-marker { display: none; }
+.create-space > summary::marker { content: ""; }
+.create-space > summary:hover { background: var(--primary-hover); }
+.create-space[open] > summary { margin-bottom: 0.75rem; }
+.create-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+.create-form input {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.9rem;
+  color: var(--foreground);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+}
+.create-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+}

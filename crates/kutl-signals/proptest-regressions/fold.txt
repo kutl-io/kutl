@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 91f63fd5bcb4cd2f014c83af20a735cb10a78ea489fbce9887de68ce1da1d078 # shrinks to records = [Signal { id: "b", space_id: "sp", document_id: None, author_did: "", timestamp: 0, record_id: "r0", event: Created, hlc: Some(Hlc { physical_ms: 0, logical: 0, actor: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }), actor_did: "did:key:zActor0", close_reason: Unspecified, sig_role: Unspecified, signature: [], attestation: None, payload: None }, Signal { id: "b", space_id: "sp", document_id: None, author_did: "", timestamp: 0, record_id: "r1", event: Created, hlc: Some(Hlc { physical_ms: 0, logical: 0, actor: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }), actor_did: "did:key:zActor0", close_reason: Unspecified, sig_role: Unspecified, signature: [], attestation: None, payload: None }], perm = [Index(0), Index(0)]

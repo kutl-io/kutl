@@ -1,0 +1,42 @@
+[package]
+name = "kutl-signals"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+# Shared signal-record foundation: canonical bytes + signing,
+# append-only segment storage, the deterministic fold, catch-up cursors.
+# One implementation consumed by the relay, the daemon, and the CLI so all
+# three compute identical signal state from identical bytes. Depends on
+# kutl-proto (records ARE the wire message) and kutl-core (Hlc order) —
+# never the reverse.
+
+[features]
+# Off by default. Enables `kutl_signals::testing`: faithful filesystem-level
+# storage-fault injectors for downstream tests (e.g. the relay's recovery
+# paths). Production builds never enable it; consumers turn it on only via a
+# dev-dependency. No production code path is gated on this feature.
+testing = []
+
+[dependencies]
+bs58 = "0.5.1"
+crc32fast = "1.5.0"
+ed25519-dalek = "2"
+kutl-core = { path = "../kutl-core" }
+kutl-proto = { path = "../kutl-proto" }
+prost = "0.14.4"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+thiserror = "2.0.18"
+uuid = "1.23.5"
+zstd = "0.13.3"
+
+[dev-dependencies]
+proptest = "1.11.0"
+tempfile = "3.27.0"
+
+[lints]
+workspace = true
+
+[package.metadata.dist]
+dist = false

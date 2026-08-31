@@ -1,0 +1,25 @@
+[package]
+name = "kutl-cli-uxr"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+# Standalone package, excluded from the workspace. Explicit `[workspace]`
+# prevents cargo from walking up to the parent workspace root and keeps these
+# heavy subprocess e2e tests out of the fast `cargo test --workspace` inner
+# loop.
+[workspace]
+
+[dev-dependencies]
+uuid = { version = "1.24.0", features = ["v4"] }
+
+[dependencies]
+escargot = "0.5.15"
+# Path-only internal dep (this package is publish = false): no version pin, so
+# a kutl-client version bump can't break the standalone test crate.
+kutl-client = { path = "../../crates/kutl-client" }
+reqwest = { version = "0.13.4", features = ["json"] }
+serde_json = "1.0.150"
+tempfile = "3.27.0"
+tokio = { version = "1.53.0", features = ["rt-multi-thread", "macros", "process", "io-util", "net", "time"] }

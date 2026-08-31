@@ -1,0 +1,75 @@
+[package]
+name = "kutl-relay"
+version = "0.5.1"
+edition = "2024"
+license = "AGPL-3.0-only"
+
+[package.metadata.dist]
+dist = false
+
+[features]
+# The executable projection contract (`relay::conformance`).
+#
+# ON BY DEFAULT, deliberately. Gated off, `cargo test` does not run it — and a
+# conformance suite nobody runs is decoration. That is the same failure mode as
+# the hand-written `deleted_at IS NULL` filters this work replaced with a view:
+# correctness that depends on someone remembering. The cost is a few hundred
+# lines of never-called helper in the library; the benefit is that the contract
+# is checked on every gate, on both substrates.
+#
+# It is also public surface on purpose: a self-hoster implementing
+# `SignalProjection` gets a suite to validate it against, which is the audience
+# `ProjectionWriter` having no default body protects.
+default = ["projection-conformance"]
+projection-conformance = []
+# Off by default. Enables `kutl_relay::testing`: storeless-relay constructors
+# for consumer test suites. Production builds never enable it; consumers turn
+# it on only via a dev-dependency. No production code path is gated on this
+# feature (unlike `projection-conformance`, which is on by default — this one
+# must never be).
+testing = []
+
+[dependencies]
+anyhow = "1.0.101"
+async-trait = "0.1.89"
+axum = { version = "0.8.9", features = ["ws"] }
+base64 = "0.22.1"
+dirs = "6.0.0"
+ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
+# default-features off: avoids pulling futures-macro (unpublished =0.3.32 pin).
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+getrandom = "0.4"
+jiff = "0.2.24"
+kutl-core = { version = "0.1.0", path = "../kutl-core" }
+kutl-proto = { version = "0.1.0", path = "../kutl-proto" }
+kutl-signals = { version = "0.1.0", path = "../kutl-signals" }
+kutl-sync-protocol = { version = "0.1.0", path = "../kutl-sync-protocol" }
+prost = "0.14.3"
+rand = "0.10.0"
+regex = "1.13.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+sha2 = "0.10.9"
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "tls-rustls", "sqlite", "migrate", "uuid"] }
+thiserror = "2.0.18"
+tokio = { version = "1.49.0", features = ["full"] }
+tokio-stream = "0.1"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
+uuid = { version = "1", features = ["v4", "v5"] }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+kutl-client = { path = "../kutl-client" }
+# Self-dependency enabling the `testing` feature for this crate's own
+# integration tests (a crate's tests link it with default features only).
+kutl-relay = { path = ".", features = ["testing"] }
+# Enables the `testing` feature so relay-side tests can call the filesystem
+# storage-fault injectors in `kutl_signals::testing`. Feature is dev-only.
+kutl-signals = { version = "0.1.0", path = "../kutl-signals", features = ["testing"] }
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "rustls"] }
+tempfile = "3.26.0"
+tokio = { version = "1.49.0", features = ["full", "test-util"] }
+tokio-tungstenite = "0.29"

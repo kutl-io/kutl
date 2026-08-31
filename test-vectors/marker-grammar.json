@@ -1,0 +1,78 @@
+{
+  "_comment": "Golden vectors for the in-doc marker grammars. The Rust relay parser (kutl-relay/src/markers/{in_doc_flag,comments}.rs) and the TypeScript editor recognizers (mention-syntax.ts, comment-syntax.ts) each implement these grammars; both test suites consume THIS file, so the grammars can only change together. Accept entries state the full parse result; reject entries must yield no match. Mention `note`: null means the |-section is absent entirely; empty string means the bar is present with an empty body (the Rust parser preserves the distinction; the TS chip renderer collapses both to '').",
+  "mention": {
+    "kinds": ["info", "completed", "review_requested", "question", "blocked"],
+    "accept": [
+      {
+        "input": "@[Ana Maria](info:did:key:z6MkTestTarget)",
+        "display": "Ana Maria",
+        "kind": "info",
+        "target": "did:key:z6MkTestTarget",
+        "note": null
+      },
+      {
+        "input": "@[Bo](review_requested:acct-1|please take a look)",
+        "display": "Bo",
+        "kind": "review_requested",
+        "target": "acct-1",
+        "note": "please take a look"
+      },
+      {
+        "input": "@[Bo](question:acct-1|)",
+        "display": "Bo",
+        "kind": "question",
+        "target": "acct-1",
+        "note": ""
+      },
+      {
+        "input": "@[C](blocked:target with spaces)",
+        "display": "C",
+        "kind": "blocked",
+        "target": "target with spaces",
+        "note": null
+      },
+      {
+        "input": "@[D](completed:id-2)",
+        "display": "D",
+        "kind": "completed",
+        "target": "id-2",
+        "note": null
+      }
+    ],
+    "reject": [
+      { "input": "@[Ana](comment:x)", "reason": "comment kind rides the [text]{.cmt #id} marker, never the @[…] form" },
+      { "input": "@[Ana](decision:x)", "reason": "decisions use heading/callout form, never the @[…] form" },
+      { "input": "@[Ana](nonsense:x)", "reason": "unknown kind" },
+      { "input": "@[](info:x)", "reason": "empty display name" },
+      { "input": "@[Ana](info:)", "reason": "empty target" },
+      { "input": "@Ana(info:x)", "reason": "missing brackets" },
+      { "input": "@[Ana] (info:x)", "reason": "space between name and arguments" },
+      { "input": "@[Ana](info x)", "reason": "missing kind separator" }
+    ]
+  },
+  "comment": {
+    "accept": [
+      {
+        "input": "[anchor text]{.cmt #123e4567-e89b-42d3-a456-426614174000}",
+        "anchor": "anchor text",
+        "id": "123e4567-e89b-42d3-a456-426614174000"
+      },
+      {
+        "input": "[]{.cmt #123e4567-e89b-42d3-a456-426614174000}",
+        "anchor": "",
+        "id": "123e4567-e89b-42d3-a456-426614174000"
+      },
+      {
+        "input": "[Mixed Case Id]{.cmt #123E4567-E89B-42D3-A456-426614174000}",
+        "anchor": "Mixed Case Id",
+        "id": "123e4567-e89b-42d3-a456-426614174000"
+      }
+    ],
+    "reject": [
+      { "input": "[text]{.cmt #not-a-uuid}", "reason": "id is not a UUID" },
+      { "input": "[text]{.cmt#123e4567-e89b-42d3-a456-426614174000}", "reason": "missing space before #" },
+      { "input": "[text]{cmt #123e4567-e89b-42d3-a456-426614174000}", "reason": "missing dot before cmt" },
+      { "input": "[text]{.cmt #123e4567-e89b-42d3-a456-42661417400}", "reason": "UUID one hex digit short" }
+    ]
+  }
+}
