@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc f8e87dd8f871ff91108d1bf4c4be5b8bd445506456c1b5e2a2226a92b5866dc3 # shrinks to events = [Register { id: 1, path: 0, at: Hlc { physical_ms: 1, logical: 0, actor: ActorId(00000000-0000-0000-0000-000000000000) } }, Register { id: 3, path: 0, at: Hlc { physical_ms: 1, logical: 0, actor: ActorId(00000000-0000-0000-0000-000000000000) } }, Register { id: 3, path: 1, at: Hlc { physical_ms: 1, logical: 0, actor: ActorId(00000000-0000-0000-0000-000000000000) } }, Register { id: 1, path: 0, at: Hlc { physical_ms: 1, logical: 0, actor: ActorId(00000000-0000-0000-0000-000000000000) } }, Register { id: 1, path: 0, at: Hlc { physical_ms: 1, logical: 0, actor: ActorId(00000000-0000-0000-0000-000000000000) } }], perm = [Index(0), Index(7378697629483820647), Index(3689348814741910324), Index(0), Index(7378697629483820647), Index(0), Index(7378697629483820647), Index(14757395258967641293)]

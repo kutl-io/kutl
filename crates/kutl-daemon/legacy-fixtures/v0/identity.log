@@ -1,0 +1,4 @@
+{"path":"doc.md","pending_write":"abababababababababababababababababababababababababababababababab"}
+{"path":"doc.md","entry":{"id":"0f0f0f0f-0000-4000-8000-000000000001","confirmed":true,"inode":4242,"last_written_hash":"abababababababababababababababababababababababababababababababab"},"register_hlc":{"physical_ms":1700000000000,"logical":1,"actor":"0f0f0f0f-0000-4000-8000-0000000000dd"},"hlc_floor":{"physical_ms":1700000000001,"logical":0}}
+{"path":"gone.md","entry":null,"register_hlc":null,"hlc_floor":{"physical_ms":1700000000002,"logical":0}}
+{"path":"torn

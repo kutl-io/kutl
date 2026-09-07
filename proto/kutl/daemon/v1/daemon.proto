@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+// Messages the daemon persists under a space's `.kutl/` directory, each
+// inside a kutl envelope (a header naming the file's kind and layout
+// version, then CRC-framed records). Nothing here crosses the wire.
+package kutl.daemon.v1;
+
+// Last-synced state of one binary file, so an unchanged blob is not re-sent
+// after a restart.
+message BlobEntry {
+  // Hex-encoded SHA-256 of the bytes last synced.
+  string hash = 1;
+  // Unix milliseconds of that sync.
+  int64 timestamp = 2;
+}
+
+// The blob-state snapshot (`.kutl/blob-state.ksnap`): relative path → entry.
+message BlobState {
+  map<string, BlobEntry> entries = 1;
+}
+
+// One tracked document: its id in the relay registry, whether the relay has
+// acknowledged it, and the identity of the bytes this daemon last placed.
+message DocEntry {
+  string id = 1;
+  bool confirmed = 2;
+  optional uint64 inode = 3;
+  optional string last_written_hash = 4;
+}
+
+// This device's last-emitted hybrid-logical-clock stamp, without the actor.
+message HlcFloor {
+  uint64 physical_ms = 1;
+  uint32 logical = 2;
+}
+
+// The registration stamp this daemon observed for a document.
+message RegisterHlc {
+  uint64 physical_ms = 1;
+  uint32 logical = 2;
+  string actor = 3;
+}
+
+// The daemon's identity state snapshot (`.kutl/state.ksnap`).
+message DaemonState {
+  map<string, DocEntry> documents = 1;
+  optional string device_id = 2;
+  HlcFloor hlc_floor = 3;
+  map<string, RegisterHlc> register_hlc = 4;
+  map<string, string> pending_writes = 5;
+  repeated string at_op_cap = 6;
+  repeated string approaching_op_cap = 7;
+}
+
+// One record of the identity journal (`.kutl/identity.klog`): what happened
+// to one path. A reader that finds no kind it knows stops replay there.
+message IdentityRecord {
+  string path = 1;
+  oneof kind {
+    IdentitySnapshot snapshot = 2;
+    IdentityRemoval removal = 3;
+    WriteIntent write_intent = 4;
+  }
+  // The clock floor at append time; max-merged at replay so a restart never
+  // re-emits a stamp at or below one already journaled. Absent on a write
+  // intent, which is not a clock event.
+  HlcFloor hlc_floor = 5;
+}
+
+// The entry now at the path and the register stamp for its document.
+message IdentitySnapshot {
+  DocEntry entry = 1;
+  RegisterHlc register_hlc = 2;
+  // The clock floor lives on the enclosing IdentityRecord.
+  reserved 3;
+  reserved "hlc_floor";
+}
+
+// The path's entry was removed.
+message IdentityRemoval {
+  // The clock floor lives on the enclosing IdentityRecord.
+  reserved 1;
+  reserved "hlc_floor";
+}
+
+// The write funnel is about to place bytes with this hex SHA-256 at the path.
+message WriteIntent {
+  string hash = 1;
+}

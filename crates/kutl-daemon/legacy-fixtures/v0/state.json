@@ -1,0 +1,29 @@
+{
+  "documents": {
+    "doc.md": {
+      "id": "0f0f0f0f-0000-4000-8000-000000000001",
+      "confirmed": true,
+      "inode": 4242,
+      "last_written_hash": "abababababababababababababababababababababababababababababababab"
+    }
+  },
+  "device_id": "0f0f0f0f-0000-4000-8000-0000000000dd",
+  "hlc_floor": {
+    "physical_ms": 1700000000000,
+    "logical": 3
+  },
+  "register_hlc": {
+    "0f0f0f0f-0000-4000-8000-000000000001": {
+      "physical_ms": 1699999999000,
+      "logical": 1,
+      "actor": "0f0f0f0f-0000-4000-8000-0000000000dd"
+    }
+  },
+  "pending_writes": {
+    "pending.md": "abababababababababababababababababababababababababababababababab"
+  },
+  "at_op_cap": [
+    "0f0f0f0f-0000-4000-8000-000000000001"
+  ],
+  "approaching_op_cap": []
+}
